@@ -115,7 +115,7 @@ void App2Dsurv::drawFrame() {
     const auto currentTime = std::chrono::high_resolution_clock::now();
     dt = std::chrono::duration<float>(currentTime - timeStart).count();
 
-    debug(1.0f / dt);
+    //debug(1.0f / dt);
 
     currentFrame = (currentFrame + 1) % maxFramesInFlight;
 }

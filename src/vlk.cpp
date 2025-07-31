@@ -253,3 +253,7 @@ void App2Dsurv::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize 
 
     vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 }
+
+float App2Dsurv::getDeltaTime() {
+    return dt;
+}

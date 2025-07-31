@@ -27,6 +27,7 @@ shader:
 	glslc shaders/shader.frag -o bin/shaders/frag.spv
 
 debug: shader
+	${MKDIR} -p obj
 	g++ -c src/main.cpp $(CFLAGS) $(DEBUGCFLAGS) $(INCLUDE) -o obj/main.o
 	g++ -c src/app.cpp $(CFLAGS) $(DEBUGCFLAGS) $(INCLUDE) -o obj/app.o
 	g++ -c src/vlk.cpp $(CFLAGS) $(DEBUGCFLAGS) $(INCLUDE) -o obj/vlk.o
@@ -36,6 +37,7 @@ debug: shader
 	cd bin ; "./$(EXENAME)"
 
 release: shader
+	${MKDIR} -p obj
 	g++ -c src/main.cpp $(CFLAGS) $(RELEASECFLAGS) $(INCLUDE) -o obj/main.o
 	g++ -c src/app.cpp $(CFLAGS) $(RELEASECFLAGS) $(INCLUDE) -o obj/app.o
 	g++ -c src/vlk.cpp $(CFLAGS) $(RELEASECFLAGS) $(INCLUDE) -o obj/vlk.o
