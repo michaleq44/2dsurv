@@ -19,9 +19,41 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
+struct Vertex {
+    glm::vec2 pos;
+    glm::vec3 color;
+
+    static VkVertexInputBindingDescription getBindingDescription() {
+        VkVertexInputBindingDescription bindingDescription = {};
+        bindingDescription.binding = 0;
+        bindingDescription.stride = sizeof(Vertex);
+        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+        return bindingDescription;
+    }
+
+    static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() {
+        std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+
+        attributeDescriptions[0].binding = 0;
+        attributeDescriptions[0].location = 0;
+        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+        attributeDescriptions[1].binding = 0;
+        attributeDescriptions[1].location = 1;
+        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+        return attributeDescriptions;
+    }
+};
+
 class App2Dsurv {
 public:
-    void run(glm::uvec2, const std::string &);
+    void run(glm::uvec2, const std::string &, int framesInFlight);
+    float getDeltaTime();
+    bool framebufferResized = false;
 
 private:
     void initWindow();
@@ -39,17 +71,25 @@ private:
     void createGraphicsPipeline();
     void createFramebuffers();
     void createCommandPool();
-    void createCommandBuffer();
+    void createVertexBuffer();
+    void createIndexBuffer();
+    void createCommandBuffers();
     void createSyncObjects();
 
     void drawFrame();
+    void recreateSwapChain();
+    void cleanupSwapChain();
+
+    static void framebufferResizedCallback(GLFWwindow* window, int width, int height);
 
     int rateDevice(VkPhysicalDevice device);
     QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
-
     VkShaderModule createShaderModule(const std::vector<char>& code);
+    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, VkBuffer buffer);
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
@@ -66,6 +106,9 @@ private:
 
     glm::uvec2 windowSize{};
     std::string title;
+    int maxFramesInFlight = 0;
+    uint32_t currentFrame = 0;
+    float dt = 0.0f;
 
     VkPhysicalDevice physicalDevice = nullptr;
     VkDevice device = nullptr;
@@ -87,14 +130,30 @@ private:
     VkPipeline graphicsPipeline = nullptr;
     std::vector<VkFramebuffer> swapChainFramebuffers;
     VkCommandPool commandPool = nullptr;
-    VkCommandBuffer commandBuffer = nullptr;
+    std::vector<VkCommandBuffer> commandBuffers;
 
-    VkSemaphore imageAvailableSemaphore = nullptr;
-    VkSemaphore renderFinishedSemaphore = nullptr;
-    VkFence inFlightFence = nullptr;
+    std::vector<VkSemaphore> imageAvailableSemaphores;
+    std::vector<VkSemaphore> renderFinishedSemaphores;
+    std::vector<VkFence> inFlightFences;
+
+    VkBuffer vertexBuffer = nullptr;
+    VkDeviceMemory vertexBufferMemory = nullptr;
+    VkBuffer indexBuffer = nullptr;
+    VkDeviceMemory indexBufferMemory = nullptr;
+
+    const std::vector<Vertex> vertices = {
+        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.25f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+        {{-0.25f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+        {{0.0f, 0.5f}, {0.0f, 1.0f, 0.0f}}
+    };
+
+    const std::vector<uint32_t> indices = {
+        0, 1, 2, 1, 3, 2
+    };
 
     const std::vector<const char*> validationLayers{
-        "VK_LAYER_KHRONOS_validation"
+        /*"VK_LAYER_KHRONOS_validation"*/
     };
     const std::vector<const char*> deviceExtensions{
         VK_KHR_SWAPCHAIN_EXTENSION_NAME

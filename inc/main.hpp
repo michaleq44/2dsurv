@@ -7,9 +7,6 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
 
 #include <iostream>
 #include <stdexcept>
@@ -22,6 +19,8 @@
 #include <limits>
 #include <algorithm>
 #include <fstream>
+#include <array>
+#include <chrono>
 
 #include <app.hpp>
 #include <vlk.hpp>

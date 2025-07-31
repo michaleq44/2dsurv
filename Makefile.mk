@@ -13,6 +13,9 @@ ifeq ($(OS),Windows_NT)
 	RELEASELDFLAGS += -mwindows
 	MKDIR = $(USR)/../usr/bin/mkdir
 else
+	ifndef USR_DIR
+		USR = /usr
+	endif
 	LIBS = $(shell pkg-config --libs glfw3) $(shell pkg-config --libs vulkan) $(shell pkg-config --libs x11) $(shell pkg-config --libs xxf86vm) $(shell pkg-config --libs xi) $(shell pkg-config --libs xrandr) -ldl -lpthread
 	CFLAGS += $(shell pkg-config --cflags glfw3) $(shell pkg-config --cflags vulkan) $(shell pkg-config --cflags x11) $(shell pkg-config --cflags xxf86vm) $(shell pkg-config --cflags xi) $(shell pkg-config --cflags xrandr)
 	MKDIR = /usr/bin/mkdir
